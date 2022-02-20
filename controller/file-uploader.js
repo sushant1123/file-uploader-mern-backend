@@ -8,10 +8,8 @@ exports.home = (req, res) => {
 };
 
 exports.fileUploader = async (req, res) => {
-	console.log(req.file);
-
 	const obj = {
-		url: "http://localhost:2000/public/" + req.file.filename,
+		url: req.file.location,
 	};
 
 	obj.createdBy = req.user._id;
@@ -19,22 +17,9 @@ exports.fileUploader = async (req, res) => {
 	//create an object with model
 	const fileObj = new FileUpload(obj);
 
-	// const filePath = path.join(path.dirname(__dirname), `./uploads/${req.file.filename}`);
-	// console.log(filePath);
-
 	//save that object in the db
 	fileObj.save(async (error, createdFileObj) => {
 		if (error) {
-			//tryout
-			await fs.unlink(req.file.path, (err) => {
-				if (err) {
-					console.log(err);
-					// - return
-					return res.status(400).json({ err });
-				}
-			});
-			//tryout end
-
 			return res.status(400).json({ error });
 		}
 		if (createdFileObj) return res.status(201).json({ createdFileObj });
