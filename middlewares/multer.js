@@ -15,30 +15,6 @@ const awsS3 = new aws.S3({
 	secretAccessKey,
 });
 
-//simple multer using disk-storage
-// const multerStorage = multer.diskStorage({
-// 	destination: (req, file, callback) => {
-// 		callback(null, path.join(path.dirname(__dirname), "uploads"));
-// 	},
-// 	filename: (req, file, callback) => {
-// 		callback(null, shortid.generate() + "-" + file.originalname);
-// 	},
-// });
-
-// multer using aws-storage
-
-// const multerS3Storage = multerS3({
-// 	s3: awsS3,
-// 	bucket: "file-uploader-app-bucket",
-// 	acl: "public-read",
-// 	metadata: function (req, file, cb) {
-// 		cb(null, { fieldName: file.fieldname });
-// 	},
-// 	key: function (req, file, cb) {
-// 		cb(null, shortid.generate() + "-" + file.originalname);
-// 	},
-// });
-
 exports.uploadS3 = multer({
 	storage: multerS3({
 		s3: awsS3,
@@ -53,5 +29,19 @@ exports.uploadS3 = multer({
 	}),
 });
 
-// exports.uploadS3 = multer({ storage: multerS3Storage });
-// exports.upload = multer({ storage: multerStorage });
+exports.deleteFileFromAWSConsole = async (url) => {
+	console.log(url);
+	let params = { Bucket: "file-uploader-app-bucket", Key: url };
+	try {
+		await awsS3.headObject(params).promise();
+		console.log("File Found in aws S3");
+		try {
+			await awsS3.deleteObject(params).promise();
+			console.log("file deleted Successfully");
+		} catch (err) {
+			console.log("ERROR in file Deleting : " + JSON.stringify(err));
+		}
+	} catch (err) {
+		console.log("File not Found ERROR : " + err);
+	}
+};
