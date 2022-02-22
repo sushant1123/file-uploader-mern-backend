@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const _env = require("dotenv");
 const path = require("path");
+const cors = require("cors");
 
 const PORT = process.env.PORT | 2000;
 
@@ -24,6 +25,7 @@ connection(username, password, dbname);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/public", express.static(path.join(__dirname, "uploads")));
+app.use(cors());
 
 app.use("/api", fileUploaderRoutes);
 app.use("/api", userRoutes);
